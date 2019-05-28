@@ -50,18 +50,34 @@
 
 # 导入依赖
 
-``
+```
+allprojects {
+    repositories {
+			
+        maven { url 'https://jitpack.io' }
+    }
+}
+``` 
+
+```
+
+dependencies {
+  implementation 'com.github.liuzhushaonian:SingleHolder:0.2'
+}
+
+``` 
 
 
-在Application的onCreate里传入实例给SlideHelper类
+
+- 在Application的onCreate里传入实例给SlideHelper类
 
 `SlideHelper.setApplication(this);`
 
-可设置全局BaseActivity，在其onCreate方法里获取SlideHelper实例
+- 可设置全局BaseActivity，在其onCreate方法里获取SlideHelper实例
 
 `slideHelper=SlideHelper.getInstance();`
 
-也可以设置是否滑动底部view，实现两种返回类型之一（默认不滑动）
+- 也可以设置是否滑动底部view，实现两种返回类型之一（默认不滑动）
 
 `slideHelper.isScroll=true;`
 
@@ -69,11 +85,10 @@ true表示底部会随之偏移，为仿微信返回。
 
 false则表示底部不会偏移，仿酷安。
 
-在想要进行滑动返回的Activity里加入这句话，即可开启滑动返回
+- 在想要进行滑动返回的Activity里加入这句话，即可开启滑动返回
 
 `slideHelper.setSlideActivity(this);`
 
-为保证退出不闪烁，还需注意一个fade.xml的动画文件，放入anim资源文件夹下即可
 
 # 感谢：
 
