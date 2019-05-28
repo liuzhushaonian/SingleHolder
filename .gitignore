@@ -65,14 +65,3 @@ fastlane/test_output
 fastlane/readme.md
 
 /app
-
-/snapshot
-/.idea
-/gradle
-/build.gradle
-/gradle.properties
-/gradlew
-/gradlew.bat
-/local.properties
-/settings.gradle
-/SingleHolder.iml
