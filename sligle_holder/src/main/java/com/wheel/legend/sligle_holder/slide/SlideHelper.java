@@ -87,6 +87,8 @@ public class SlideHelper implements Application.ActivityLifecycleCallbacks {
 
         viewGroup.removeView(view);//移除它
 
+        view.setBackgroundColor(Color.WHITE);
+
         parent.addView(view,0);//放置在自己写的parent里
 
         viewGroup.addView(parent,0);//将parent放入到这个viewgroup里
