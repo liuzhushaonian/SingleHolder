@@ -1,1 +1,1 @@
-include ':app', ':sligle_holder'
+include ':app', ':sligle_holder', ':demo'
