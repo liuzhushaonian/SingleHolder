@@ -3,6 +3,11 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light">
         <!-- Customize your theme here. -->
+
+        <item name="android:background">@color/colorPink</item>
+
+
+
     </style>
 
 </resources>
