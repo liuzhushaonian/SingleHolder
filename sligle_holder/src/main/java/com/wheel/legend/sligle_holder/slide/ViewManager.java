@@ -26,10 +26,9 @@ class ViewManager {
             activities = new ArrayList<>();
         }
 
-        this.slideHelper=slideHelper;
+        this.slideHelper = slideHelper;
 
     }
-
 
 
     //添加
@@ -50,10 +49,8 @@ class ViewManager {
             return;
         }
         activities.remove(activity);
-//            Log.d("remove-size-->>>",activities.size()+"");
 
-        //恢复持有
-//            slideHelper.resetActivity(activities.get(activities.size()-1));
+        slideHelper.resetActivity(activity);
 
 
     }
@@ -71,14 +68,15 @@ class ViewManager {
             return;
         }
 
-        for (int i = activities.size(); i >= 0; i--) {
+        int index = activities.indexOf(activity);//获取当前Activity的位置
 
-            if (activity == activities.get(i - 1)) {
-                previousActivity = activities.get(i - 2);
-                break;
-            }
+        if (index > 0) {
+
+            previousActivity = activities.get(index - 1);//获取上一个Activity
+
 
         }
+
 
         if (previousActivity == null) {
 
@@ -87,31 +85,56 @@ class ViewManager {
             return;
         }
 
-        //获取上一个Activity的界面
+        //获取上一个Activity的界面,不要特殊view，要特殊view内的真实view
         ViewGroup viewGroup1 = (ViewGroup) previousActivity.getWindow().getDecorView();
 
-        this.preView = viewGroup1.getChildAt(0);
 
-        viewGroup1.removeView(this.preView);//移除
+        if (isT(viewGroup1.getChildAt(0))) {
+
+            ViewGroup tView = (ViewGroup) viewGroup1.getChildAt(0);//获取到特殊view
+
+            if (isT(tView)) {
+
+                View sView = ((SlideParentFrameLayout) tView).getDragView();//直接获取拖拽view
+
+                this.preView = sView;//获取里面真实的view
+
+                tView.removeView(sView);//移除
+
+            }
+
+        } else {//不是特殊view
+
+            this.preView = viewGroup1.getChildAt(0);
+
+            viewGroup1.removeView(this.preView);//移除
 
 
-        //获取当前Activity最底部ViewGroup
+        }
+
+        //获取当前Activity最底部ViewGroup,放置底部view
         ViewGroup viewGroup = (ViewGroup) activity.getWindow().getDecorView();
 
-        ViewGroup frame= (ViewGroup) viewGroup.getChildAt(0);
+        if (isT(viewGroup.getChildAt(0))) {//如果是特定的view，则放入其中，如果不是，则不动
 
-        frame.addView(this.preView, 0);//
+            ViewGroup frame = (ViewGroup) viewGroup.getChildAt(0);
+
+            ((SlideParentFrameLayout) frame).setBottomView(this.preView);
+
+        }
+
 
     }
 
     /**
      * 重置Activity界面，避免关闭Activity后使得界面消失
      * 带动画效果，为向右滑到尽头后使Activity退出
+     *
      * @param activity 传入当前Activity
      */
     void resetView(Activity activity) {
         if (activity == null || go()) {
-            Log.d("waning!", "the activities is null or size is 0");
+            Log.e("waning!", "the activities is null or size is 0");
             return;
         }
 
@@ -130,26 +153,38 @@ class ViewManager {
             return;
         }
 
-        ViewGroup viewGroup = (ViewGroup) activity.getWindow().getDecorView();
+        ViewGroup viewGroup = (ViewGroup) activity.getWindow().getDecorView();//获取当前Activity的容器
 
-        ViewGroup frame= (ViewGroup) viewGroup.getChildAt(0);
 
-        View view = frame.getChildAt(0);
+        ViewGroup frame = (ViewGroup) viewGroup.getChildAt(0);//从当前Activity挖出特殊viewgroup
 
-        ViewGroup previousViewGroup = (ViewGroup) previousActivity.getWindow().getDecorView();
+        if (isT(frame)) {//获取到的是特殊view
 
-        //动画，代替下面三行代码
-        setTransition(view, frame, previousViewGroup);
+            View view = ((SlideParentFrameLayout) frame).getBottomView();//从特殊view获取上一个Activity的view
 
-//            frame.removeView(view);
-//
-//            previousViewGroup.addView(view);
-//
-//            if (slideHelper.isScroll) {
-//                view.scrollTo(0, 0);//摆正位置
-//            } else {
-//                frame.removeViewAt(0);//移除阴影
-//            }
+            ViewGroup previousViewGroup = (ViewGroup) previousActivity.getWindow().getDecorView();
+
+            if (isT(previousViewGroup.getChildAt(0))) {//是容器
+                ViewGroup tView = (ViewGroup) previousViewGroup.getChildAt(0);
+
+                if (isT(tView)) {//上一个也是特殊view，
+
+                    //动画，代替下面三行代码
+                    setTransition(view, frame, tView);
+
+
+                }
+
+            } else {
+
+
+                setTransition(view, frame, previousViewGroup);
+
+
+            }
+
+
+        }
 
 
     }
@@ -168,14 +203,14 @@ class ViewManager {
 
         Activity previousActivity = null;
 
-        for (int i = activities.size(); i >= 0; i--) {
+        int index = activities.indexOf(activity);
 
-            if (activity == activities.get(i - 1)) {
-                previousActivity = activities.get(i - 2);
-                break;
-            }
+        if (index > 0) {
+
+            previousActivity = activities.get(index - 1);
 
         }
+
 
         if (previousActivity == null) {
             return;
@@ -183,23 +218,40 @@ class ViewManager {
 
         ViewGroup viewGroup = (ViewGroup) activity.getWindow().getDecorView();//获取底部最外层
 
-        ViewGroup frame= (ViewGroup) viewGroup.getChildAt(0);//获取自定义的外层
+        ViewGroup frame = (ViewGroup) viewGroup.getChildAt(0);//获取自定义的外层
 
-        View view = frame.getChildAt(0);//获取上一个界面的view
+        if (isT(frame)) {
 
-        ViewGroup previousViewGroup = (ViewGroup) previousActivity.getWindow().getDecorView();//获取上一个界面的外层
+            View view = ((SlideParentFrameLayout) frame).getBottomView();//获取上一个界面的view
+
+            ViewGroup previousViewGroup = (ViewGroup) previousActivity.getWindow().getDecorView();//获取上一个界面的外层
 
 //            setTransition(view,viewGroup,previousViewGroup);
 
-        frame.removeView(view);//移除上一个界面的view
+            frame.removeView(view);//移除上一个界面的view
 
-        previousViewGroup.addView(view, 0);//添加回上一个界面
+            if (isT(previousViewGroup.getChildAt(0))) {
 
-        if (slideHelper.isScroll) {
-            view.scrollTo(0, 0);//摆正位置
-        } else {
-            frame.removeViewAt(0);//移除阴影
+                ViewGroup tView = (ViewGroup) previousViewGroup.getChildAt(0);
+
+
+                if (isT(tView)) {
+
+                    ((SlideParentFrameLayout) tView).setDragView(view);
+
+                }
+            } else {
+
+                previousViewGroup.addView(view, 0);//添加回上一个界面
+
+            }
+
+            if (slideHelper.isScroll) {
+                view.scrollTo(0, 0);//摆正位置
+            }
+
         }
+
 
     }
 
@@ -209,26 +261,6 @@ class ViewManager {
         return activities == null || activities.size() == 0 | activities.size() == 1;
     }
 
-
-    /**
-     * 改变底下view的位置，随着滑动而滑动
-     *
-     * @param space 距离
-     */
-    void changeViewLocation(int space) {
-
-        if (this.preView == null) {
-            return;
-        }
-        if (space > slideHelper.getWidth()) {
-            space = slideHelper.getWidth();
-        }
-
-        int width = this.preView.getResources().getDisplayMetrics().widthPixels - space;
-
-        this.preView.scrollTo((int) (width * 0.5), 0);
-
-    }
 
     /**
      * 移除view动画
@@ -242,18 +274,28 @@ class ViewManager {
         ObjectAnimator animator = ObjectAnimator.ofFloat(view, "alpha", 1.0f, 1.0f).setDuration(100);
 
 
-
         //重点！！动画结束后立刻将view移除并添加到上一个Activity里，保证无缝跳转
         animator.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
 
                 viewGroup1.removeView(view);
-                if (slideHelper.isScroll) {
-                    viewGroup1.removeViewAt(0);
+
+                if (isT(viewGroup2)) {
+
+
+                    ((SlideParentFrameLayout) viewGroup2).setDragView(view);
+                } else {
+
+//                    viewGroup2.removeView(view);
+                    viewGroup2.addView(view, 0);
                 }
 
-                addView(view, viewGroup2);
+                //摆正view的位置
+                if (slideHelper.isScroll) {
+                    view.scrollTo(0, 0);
+                }
+
 
             }
         });
@@ -261,28 +303,17 @@ class ViewManager {
         animator.start();
     }
 
+
     /**
-     * 添加view
-     *
-     * @param view 上面的内容
-     * @param viewGroup 容器
+     * 判断是不是特殊view
+     * @param view 传入view
+     * @return 返回bool
      */
-    private void addView(View view, ViewGroup viewGroup) {
+    private boolean isT(View view) {
 
-//            ObjectAnimator animator = ObjectAnimator.ofFloat(view, "alpha", 1.0f, 1.0f).setDuration(100);
-//
-//
-//            animator.addListener(new AnimatorListenerAdapter() {
-//                @Override
-//                public void onAnimationEnd(Animator animation) {
-////                    super.onAnimationStart(animation);
 
-        viewGroup.addView(view, 0);
-
-        //摆正view的位置
-        if (slideHelper.isScroll) {
-            view.scrollTo(0, 0);
-        }
+        return view instanceof SlideParentFrameLayout;
 
     }
+
 }
