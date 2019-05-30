@@ -35,22 +35,25 @@
 
 4、可以设置两种返回类型，一种是仿微信返回（底部有偏移），另一种是仿酷安返回（底部不偏移，但是有阴影）
 
-5、小巧，所有操作都在一个类里，八百行代码，让你的APP从此拥有滑动返回功能，一只手就能hold得住
-
-# 不足：
-
-<S>1、暂时无法做到禁止某Activity使用滑动返回（这条貌似做到了，不好意思走错片场了）</S>
-
-2、暂时无法改变默认触摸距离（内设为16dp）
-
-3、暂时需要一个xml文件作为退出动画（这也是上面所说的缺陷）
 
 # 使用方法：
 
 
 # 导入依赖
 
-``
+```
+allprojects {
+    repositories {
+    maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+```
+dependencies {
+implementation 'com.github.liuzhushaonian:SingleHolder:1.01'
+}
+```  
 
 
 在Application的onCreate里传入实例给SlideHelper类
@@ -63,7 +66,7 @@
 
 也可以设置是否滑动底部view，实现两种返回类型之一（默认不滑动）
 
-`slideHelper.isScroll=true;`
+`slideHelper.setScroll(true);`
 
 true表示底部会随之偏移，为仿微信返回。
 
@@ -73,7 +76,7 @@ false则表示底部不会偏移，仿酷安。
 
 `slideHelper.setSlideActivity(this);`
 
-为保证退出不闪烁，还需注意一个fade.xml的动画文件，放入anim资源文件夹下即可
+
 
 # 感谢：
 
